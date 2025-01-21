@@ -4,8 +4,8 @@
 
 
 ### 01绘制静态点
-![](staticpoint.png)
-![](asserts/staticpointcode.png)
+![](./asserts/staticpoint.png)
+![](./asserts/staticpointcode.png)
 
 
 ### 02绘制动态点-根据鼠标点击位置生成
