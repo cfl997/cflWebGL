@@ -4,10 +4,10 @@
 
 
 ### 01绘制静态点
-![[/asserts/Pasted image 20250120133608.png]]
+![[staticpoint.png]]
 
-![[/asserts/Pasted image 20250120132822.png]]
+![[/asserts/staticpointcode.png]]
 
 ### 02绘制动态点-根据鼠标点击位置生成
 
-![[/asserts/Pasted image 20250121160347.png]]
+![[./asserts/dynamicpoint.png]]
