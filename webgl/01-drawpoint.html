@@ -10,83 +10,92 @@
     //https://glmatrix.net/
     </script>
     <script>
-
-        let vertexstring = `
-        attribute vec4 pos;
-        uniform     mat4    proj;
-        void main(void){
-            gl_Position =proj *  pos;
-            gl_PointSize=60.0;
-        }
-        `;
-        let fragmentstring = `
-        void main(void){
-          gl_FragColor = vec4(0,0,1.0,1.0);
-        }
-        `;
-        var projMat4 = mat4.create();
-        var webgl;
-        //定义整个流程
-        function init()
-        {
-            initWebgl();
-            initShader();
-            initBuffer();
-            draw();
-        }
-
-        function initWebgl()
-        {
-            let webglDiv=document.getElementById("cflCanvas");
-            webgl=webglDiv.getContext("webgl");
-            webgl.viewport(0,0,webglDiv.clientWidth,webglDiv.clientHeight);
-            mat4.ortho(0,webglDiv.clientWidth,webglDiv.clientHeight,0,-1.,1.,projMat4);
-        }
-
-        function initShader() {
-            let vsshader = webgl.createShader(webgl.VERTEX_SHADER);
-            let fsshader = webgl.createShader(webgl.FRAGMENT_SHADER);
-
-            webgl.shaderSource(vsshader, vertexstring);
-            webgl.shaderSource(fsshader, fragmentstring);
-
-            webgl.compileShader(vsshader);
-            webgl.compileShader(fsshader);
-            if (!webgl.getShaderParameter(vsshader, webgl.COMPILE_STATUS)) {
-                var err = webgl.getShaderInfoLog(vsshader);
-                alert(err);
-                return;
+        class WebGLApp {
+            constructor() {
+                this.vertexString = `
+                attribute vec4 pos;
+                uniform mat4 proj;
+                void main(void){
+                    gl_Position = proj * pos;
+                    gl_PointSize = 60.0;
+                }
+                `;
+                this.fragmentString = `
+                void main(void){
+                    gl_FragColor = vec4(0, 0, 1.0, 1.0);
+                }
+                `;
+                this.projMat4 = mat4.create();
+                this.webgl = null;
             }
-            if (!webgl.getShaderParameter(fsshader, webgl.COMPILE_STATUS)) {
-                var err = webgl.getShaderInfoLog(fsshader);
-                alert(err);
-                return;
+
+            init() {
+                this.initWebgl();
+                this.initShader();
+                this.initBuffer();
+                this.draw();
             }
-            let program = webgl.createProgram();
-            webgl.attachShader(program, vsshader);
-            webgl.attachShader(program, fsshader)
 
-            webgl.linkProgram(program);
-            webgl.useProgram(program);
+            initWebgl() {
+                let webglDiv = document.getElementById("cflCanvas");
+                this.webgl = webglDiv.getContext("webgl");
+                this.webgl.viewport(0, 0, webglDiv.clientWidth, webglDiv.clientHeight);
+                mat4.ortho(0, webglDiv.clientWidth, webglDiv.clientHeight, 0, -1., 1., this.projMat4);
+            }
 
-            webgl.program = program
+            initShader() {
+                let vsshader = this.webgl.createShader(this.webgl.VERTEX_SHADER);
+                let fsshader = this.webgl.createShader(this.webgl.FRAGMENT_SHADER);
+
+                this.webgl.shaderSource(vsshader, this.vertexString);
+                this.webgl.shaderSource(fsshader, this.fragmentString);
+
+                this.webgl.compileShader(vsshader);
+                this.webgl.compileShader(fsshader);
+
+                if (!this.webgl.getShaderParameter(vsshader, this.webgl.COMPILE_STATUS)) {
+                    var err = this.webgl.getShaderInfoLog(vsshader);
+                    alert(err);
+                    return;
+                }
+                if (!this.webgl.getShaderParameter(fsshader, this.webgl.COMPILE_STATUS)) {
+                    var err = this.webgl.getShaderInfoLog(fsshader);
+                    alert(err);
+                    return;
+                }
+
+                let program = this.webgl.createProgram();
+                this.webgl.attachShader(program, vsshader);
+                this.webgl.attachShader(program, fsshader);
+
+                this.webgl.linkProgram(program);
+                this.webgl.useProgram(program);
+
+                this.webgl.program = program;
+            }
+
+            initBuffer() {
+                let pointPosition = new Float32Array([100.0, 100.0, 0.0, 1.0]);
+                let aPosition = this.webgl.getAttribLocation(this.webgl.program, "pos");
+                this.webgl.vertexAttrib4fv(aPosition, pointPosition);
+                let uniformProj = this.webgl.getUniformLocation(this.webgl.program, "proj");
+                this.webgl.uniformMatrix4fv(uniformProj, false, this.projMat4);
+            }
+
+            draw() {
+                this.webgl.clearColor(1.0, 0.0, 0.0, 1.0);
+                this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
+                this.webgl.drawArrays(this.webgl.POINTS, 0, 1);
+            }
         }
-        function initBuffer() {
-            let pointPosition = new Float32Array([100.0, 100.0, 0.0, 1.0]);
-            let aPsotion = webgl.getAttribLocation(webgl.program, "pos");
-            webgl.vertexAttrib4fv(aPsotion, pointPosition);
-            let uniformProj = webgl.getUniformLocation(webgl.program, "proj");
-            webgl.uniformMatrix4fv(uniformProj, false, projMat4);
-        }
-        function draw() {
-            webgl.clearColor(1.0, 0.0, 0.0, 1.0);
-            webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
-            webgl.drawArrays(webgl.POINTS, 0, 1);
-        }
+
+        window.onload = () => {
+            const app = new WebGLApp();
+            app.init();
+        };
     </script>
 </head>
-<body onload="init()">
+<body>
     <canvas id="cflCanvas" width="1024" height="720"></canvas>
-    
 </body>
 </html>
